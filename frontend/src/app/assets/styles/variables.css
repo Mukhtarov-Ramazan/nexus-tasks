@@ -1,0 +1,40 @@
+:root {
+  /* Светлая тема */
+  --color-bg-light: #FAFAFA;
+  --color-surface-light: #FFFFFF;
+  --color-text-primary-light: #1A1A1A;
+  --color-text-secondary-light: #6B7280;
+  --color-border-light: #E5E7EB;
+
+  /* Общие */
+  --color-primary: #2563EB;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+
+  /* Шрифты */
+  --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-family-mono: 'JetBrains Mono', monospace;
+
+  /* Размеры */
+  --font-size-base: 14px;
+  --font-size-heading: 16px;
+  --font-size-title: 20px;
+
+  /* Отступы */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  /* Радиусы */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* Тени */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
