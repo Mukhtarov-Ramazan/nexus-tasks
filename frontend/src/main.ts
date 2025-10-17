@@ -1,15 +1,20 @@
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
 
-import App from './app/App.vue'
-import router from './app/router'
+import { primevueConfig } from './app/primevue-config';
+import PrimeVue from 'primevue/config'
 
-import '@/app/assets/styles/variables.css'
-import '@/app/assets/styles/index.scss'
+import App from './app/App.vue';
+import router from './app/router';
 
-const app = createApp(App)
+import '@/app/assets/styles/variables.css';
+import '@/app/assets/styles/index.scss';
+import 'primeicons/primeicons.css';
 
-app.use(createPinia())
-app.use(router)
+const app = createApp(App);
 
-app.mount('#app')
+app.use(createPinia());
+app.use(router);
+app.use(PrimeVue, primevueConfig);
+
+app.mount('#app');
