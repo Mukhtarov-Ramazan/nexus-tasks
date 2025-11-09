@@ -21,13 +21,3 @@ a {
   }
 }
 
-.p-card, .p-datatable, .p-panel, .p-dialog, .p-dropdown {
-  background: var(--surface-card) !important;
-  color: var(--text-color) !important;
-  transition: background-color 0.3s, color 0.3s;
-}
-
-table, th, td {
-  background: var(--surface-table) !important;
-  color: var(--text-color) !important;
-}

@@ -1,16 +1,16 @@
 :root {
   /* Цвета для светлой темы (по умолчанию) */
-  --color-bg: #FAFAFA;
-  --color-surface: #FFFFFF;
-  --color-text-primary: #1A1A1A;
-  --color-text-secondary: #6B7280;
-  --color-border: #E5E7EB;
+  --color-bg: #fafafa;
+  --color-surface: #ffffff;
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #6b7280;
+  --color-border: #e5e7eb;
 
   /* Общие цвета */
-  --color-primary: #2563EB;
-  --color-success: #10B981;
-  --color-warning: #F59E0B;
-  --color-error: #EF4444;
+  --color-primary: #2563eb;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
 
   /* Шрифты */
   --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -40,10 +40,10 @@
 }
 
 /* Темная тема */
-[data-theme="dark"] {
-  --color-bg: #0A0A0A;
-  --color-surface: #1A1A1A;
-  --color-text-primary: #FAFAFA;
-  --color-text-secondary: #9CA3AF;
-  --color-border: #2D2D2D;
+[data-theme='dark'] {
+  --color-bg: #0a0a0a;
+  --color-surface: #1a1a1a;
+  --color-text-primary: #fafafa;
+  --color-text-secondary: #9ca3af;
+  --color-border: #2d2d2d;
 }
