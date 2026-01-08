@@ -1,11 +1,21 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router';
+  import { computed } from 'vue';
+import { RouterView, useRoute } from 'vue-router';
+import AuthLayout from '@/layouts/AuthLayout.vue';
+import DefaultLayout from '@/layouts/DefaultLayout.vue';
+
+const route = useRoute();
+
+const currentLayout = computed(() => {
+  return route.meta.layout || DefaultLayout;
+});
 </script>
 
 <template>
   <UApp>
-    <UColorModeButton/>
-    <RouterView />
+    <component :is="currentLayout">
+      <RouterView />
+    </component>
   </UApp>
 </template>
 

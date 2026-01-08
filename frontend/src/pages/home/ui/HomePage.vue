@@ -1,10 +1,6 @@
 <template>
   <div style="padding: 24px; display: flex; flex-direction: column; gap: 24px">
     <!-- Переключатель темы -->
-    <div style="display: flex; justify-content: flex-end">
-      <!-- <UColorModeSwitch /> -->
-       <UColorModeButton />
-    </div>
 
     <!-- Пример кнопок с цветом black -->
     <div style="display: flex; gap: 16px">
