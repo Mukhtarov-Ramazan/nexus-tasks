@@ -1,7 +1,13 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+
 const props = defineProps({
   isUser: { type: Boolean, default: false },
 });
+
+const showPass = ref(false);
+const showPassConfirm = ref(false);
+const password = ref('');
 
 const onSubmit = (): void => {
   console.log('Зарегистрироваться');
@@ -11,25 +17,65 @@ const onSubmit = (): void => {
 <template>
   <form class="registration-form" @submit="onSubmit">
     <UFormField v-if="!props.isUser" label="Название компании">
-      <UInput placeholder="Введите название компании" class="w-full" />
+      <UInput size="xl" placeholder="Введите название компании" class="w-full" />
     </UFormField>
 
     <UFormField label="Email">
-      <UInput placeholder="Введите почту" type="email" class="w-full" />
+      <UInput size="xl" placeholder="Введите почту" type="email" class="w-full" />
     </UFormField>
 
     <UFormField label="Пароль">
-      <UInput placeholder="Введите пароль" type="password" class="w-full" />
+      <UInput
+        v-model="password"
+        :type="showPass ? 'text' : 'password'"
+        size="xl"
+        placeholder="Введите пароль"
+        :ui="{ trailing: 'pe-1' }"
+        class="w-full"
+      >
+        <template #trailing>
+          <UButton
+            color="neutral"
+            variant="link"
+            size="sm"
+            :icon="showPass ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+            :aria-label="showPass ? 'Скрыть пароль' : 'Показать пароль'"
+            :aria-pressed="showPass"
+            aria-controls="password"
+            @click="showPass = !showPass"
+          />
+        </template>
+      </UInput>
     </UFormField>
 
     <UFormField label="Подтвердите пароль">
-      <UInput placeholder="Введите пароль повторно" type="password" class="w-full" />
+      <UInput
+        v-model="password"
+        :type="showPassConfirm ? 'text' : 'password'"
+        size="xl"
+        placeholder="Введите пароль повторно"
+        :ui="{ trailing: 'pe-1' }"
+        class="w-full"
+      >
+        <template #trailing>
+          <UButton
+            color="neutral"
+            variant="link"
+            size="sm"
+            :icon="showPassConfirm ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+            :aria-label="showPassConfirm ? 'Скрыть пароль' : 'Показать пароль'"
+            :aria-pressed="showPassConfirm"
+            aria-controls="password"
+            @click="showPassConfirm = !showPassConfirm"
+          />
+        </template>
+      </UInput>
     </UFormField>
 
-    <div class="consent">
+    <!-- <div class="consent">
       Регистрируясь, вы даёте согласие на обработку персональных данных согласно
       <ULink to="/privacy-policy" target="_blank">Политике конфиденциальности</ULink>.
-    </div>
+    </div> -->
 
     <UButton type="submit" color="neutral" block>Зарегистрироваться</UButton>
 

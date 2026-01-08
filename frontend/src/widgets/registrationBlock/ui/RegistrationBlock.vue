@@ -15,7 +15,7 @@ const items = [
 
 <template>
   <div class="registration-block">
-    <UTabs :items="items" color="neutral">
+    <UTabs :items="items" color="neutral" size="lg">
       <template #company>
         <RegistrationCompanyForm />
       </template>

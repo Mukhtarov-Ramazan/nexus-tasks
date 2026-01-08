@@ -4,6 +4,7 @@ import { RouterView } from 'vue-router';
 
 <template>
   <UApp>
+    <UColorModeButton/>
     <RouterView />
   </UApp>
 </template>

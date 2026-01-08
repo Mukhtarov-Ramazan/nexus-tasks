@@ -6,7 +6,6 @@ import { RegistrationBlock } from '@/widgets/registrationBlock';
   <div class="auth">
     <div class="auth__wrapper">
       <h1 class="auth__title">NexusTasks</h1>
-      <UColorModeButton />
 
       <RegistrationBlock />
     </div>

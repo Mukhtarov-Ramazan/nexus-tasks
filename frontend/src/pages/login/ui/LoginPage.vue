@@ -6,7 +6,6 @@ import { LoginBlock } from '@/widgets/loginBlock';
   <div class="login">
     <div class="login__wrapper">
       <h1 class="login__title">NexusTasks</h1>
-      <UColorModeButton />
 
       <LoginBlock />
     </div>
