@@ -1,20 +1,14 @@
 <script setup lang="ts">
-import RegistrationCompanyForm from '@/features/registration/ui/RegistrationCompanyForm.vue';
+import { RegistrationCompanyForm } from '@/features/registration';
 
 const items = [
-  {
-    label: 'Для компании',
-    slot: 'company',
-  },
-  {
-    label: 'Для себя',
-    slot: 'user',
-  },
+  { label: 'Для компании', slot: 'company' },
+  { label: 'Для себя', slot: 'user' },
 ];
 </script>
 
 <template>
-  <div class="registration-block">
+  <div class="w-full">
     <UTabs :items="items" color="neutral" size="lg">
       <template #company>
         <RegistrationCompanyForm />
@@ -26,9 +20,3 @@ const items = [
     </UTabs>
   </div>
 </template>
-
-<style scoped lang="scss">
-.registration-block {
-  width: 100%;
-}
-</style>

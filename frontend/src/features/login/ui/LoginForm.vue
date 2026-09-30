@@ -4,27 +4,17 @@ import type { FormError, FormSubmitEvent } from '@nuxt/ui';
 import { ROUTES } from '@/shared/config';
 import { PasswordInput } from '@/shared/ui';
 
-const props = defineProps<{ isUser?: boolean }>();
-
 const state = reactive({
-  companyName: '',
   email: '',
   password: '',
-  passwordConfirm: '',
 });
 
 type Schema = typeof state;
 
 function validate(values: Partial<Schema>): FormError[] {
   const errors: FormError[] = [];
-  if (!props.isUser && !values.companyName) {
-    errors.push({ name: 'companyName', message: 'Введите название компании' });
-  }
   if (!values.email) errors.push({ name: 'email', message: 'Введите почту' });
   if (!values.password) errors.push({ name: 'password', message: 'Введите пароль' });
-  if (values.password !== values.passwordConfirm) {
-    errors.push({ name: 'passwordConfirm', message: 'Пароли не совпадают' });
-  }
   return errors;
 }
 
@@ -40,21 +30,12 @@ function onSubmit(event: FormSubmitEvent<Schema>) {
     class="mt-5 flex w-full flex-col gap-4"
     @submit="onSubmit"
   >
-    <UFormField v-if="!props.isUser" label="Название компании" name="companyName">
-      <UInput
-        v-model="state.companyName"
-        size="xl"
-        placeholder="Введите название компании"
-        class="w-full"
-      />
-    </UFormField>
-
     <UFormField label="Email" name="email">
       <UInput
         v-model="state.email"
+        type="email"
         size="xl"
         placeholder="Введите почту"
-        type="email"
         class="w-full"
       />
     </UFormField>
@@ -63,15 +44,11 @@ function onSubmit(event: FormSubmitEvent<Schema>) {
       <PasswordInput v-model="state.password" placeholder="Введите пароль" />
     </UFormField>
 
-    <UFormField label="Подтвердите пароль" name="passwordConfirm">
-      <PasswordInput v-model="state.passwordConfirm" placeholder="Введите пароль повторно" />
-    </UFormField>
-
-    <UButton type="submit" color="neutral" block>Зарегистрироваться</UButton>
+    <UButton type="submit" color="neutral" block>Войти</UButton>
 
     <div class="mt-2.5 text-center text-sm">
-      Уже есть аккаунт?
-      <ULink :to="ROUTES.login">Войти</ULink>
+      Нет аккаунта?
+      <ULink :to="ROUTES.registration">Зарегистрироваться</ULink>
     </div>
   </UForm>
 </template>

@@ -1,52 +1,25 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useRoute } from 'vue-router';
-import type { NavigationMenuItem, DropdownMenuItem} from '@nuxt/ui';
+import type { NavigationMenuItem, DropdownMenuItem } from '@nuxt/ui';
+import { ROUTES } from '@/shared/config';
 
-const route = useRoute();
+const navItems: NavigationMenuItem[] = [
+  { label: 'Задачи', to: ROUTES.home },
+  { label: 'Чат', to: ROUTES.messenger },
+];
 
-const navItems = computed<NavigationMenuItem[]>(() => [
-  {
-    label: 'Задачи',
-    to: '/',
-    active: route.path.startsWith('/'),
-  },
-  {
-    label: 'Чат',
-    to: '/chat',
-    active: route.path.startsWith('/chat'),
-  },
-]);
-
-const items = ref<DropdownMenuItem[][]>([
+const userMenu: DropdownMenuItem[][] = [
   [
-    {
-      label: 'Profile',
-      icon: 'i-lucide-user',
-    },
-    {
-      label: 'Billing',
-      icon: 'i-lucide-credit-card',
-    },
-    {
-      label: 'Settings',
-      icon: 'i-lucide-cog',
-    //   kbds: [','],
-    },
+    { label: 'Профиль', icon: 'i-lucide-user' },
+    { label: 'Оплата', icon: 'i-lucide-credit-card' },
+    { label: 'Настройки', icon: 'i-lucide-cog' },
   ],
-  [
-    {
-      label: 'Logout',
-      icon: 'i-lucide-log-out',
-    //   kbds: ['shift', 'meta', 'q'],
-    },
-  ],
-]);
+  [{ label: 'Выйти', icon: 'i-lucide-log-out' }],
+];
 </script>
 
 <template>
-  <div class="default-layout">
-    <UHeader class="container">
+  <div>
+    <UHeader :ui="{ container: 'max-w-[1920px]' }">
       <template #title>
         <h1>NexusTasks</h1>
       </template>
@@ -56,25 +29,20 @@ const items = ref<DropdownMenuItem[][]>([
       <template #right>
         <UColorModeButton />
 
-        <UDropdownMenu
-          :items="items"
-          :ui="{
-            content: 'w-48',
-          }"
-        >
-          <!-- <UButton icon="i-lucide-menu" color="neutral" variant="outline" /> -->
+        <UDropdownMenu :items="userMenu" :ui="{ content: 'w-48' }">
           <UAvatar alt="Mukhtarov Ramazan" />
         </UDropdownMenu>
       </template>
     </UHeader>
-    <slot />
+
+    <UContainer>
+      <UPage>
+        <template #left>
+          <UPageAside />
+        </template>
+
+        <slot />
+      </UPage>
+    </UContainer>
   </div>
 </template>
-
-<style scoped lang="scss">
-:deep(.container) {
-  max-width: 1920px;
-  padding: 0 24px;
-  margin: 0 auto;
-}
-</style>

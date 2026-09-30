@@ -1,1 +1,1 @@
-export { default as LoginBlock } from './ui/LoginBlock.vue'
+export { default as LoginBlock } from './ui/LoginBlock.vue';

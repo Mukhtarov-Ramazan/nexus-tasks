@@ -1,1 +1,1 @@
-export { default as RegistrationPage } from './ui/RegistrationPage.vue'
+export { default as RegistrationPage } from './ui/RegistrationPage.vue';

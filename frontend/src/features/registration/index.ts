@@ -1,1 +1,1 @@
-export { default as RegistrationCompanyForm } from './ui/RegistrationCompanyForm.vue'
+export { default as RegistrationCompanyForm } from './ui/RegistrationCompanyForm.vue';

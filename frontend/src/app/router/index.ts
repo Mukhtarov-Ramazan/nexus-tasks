@@ -1,30 +1,26 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import AuthLayout from '@/layouts/AuthLayout.vue';
-import DefaultLayout from '@/layouts/DefaultLayout.vue';
-import { HomePage } from '@/pages/home';
-import { RegistrationPage } from '@/pages/auth';
-import { LoginPage } from '@/pages/login';
+import { ROUTES } from '@/shared/config';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
+      path: ROUTES.home,
       name: 'home',
-      component: HomePage,
-      meta: { layout: DefaultLayout },
+      component: () => import('@/pages/home').then(m => m.HomePage),
+      meta: { layout: 'default' },
     },
     {
-      path: '/registration',
+      path: ROUTES.registration,
       name: 'registration',
-      component: RegistrationPage,
-      meta: { layout: AuthLayout },
+      component: () => import('@/pages/registration').then(m => m.RegistrationPage),
+      meta: { layout: 'auth' },
     },
     {
-      path: '/login',
+      path: ROUTES.login,
       name: 'login',
-      component: LoginPage,
-      meta: { layout: AuthLayout },
+      component: () => import('@/pages/login').then(m => m.LoginPage),
+      meta: { layout: 'auth' },
     },
   ],
 });

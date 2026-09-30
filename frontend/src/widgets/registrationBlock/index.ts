@@ -1,1 +1,1 @@
-export { default as RegistrationBlock } from './ui/RegistrationBlock.vue'
+export { default as RegistrationBlock } from './ui/RegistrationBlock.vue';
