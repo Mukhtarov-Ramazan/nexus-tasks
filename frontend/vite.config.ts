@@ -22,6 +22,10 @@ export default defineConfig({
       },
     }),
   ],
+  server: {
+    // На этой машине IPv6-loopback (::1) не работает, а Vite по умолчанию слушает именно его
+    host: '127.0.0.1',
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

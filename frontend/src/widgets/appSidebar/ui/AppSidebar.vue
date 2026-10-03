@@ -8,12 +8,12 @@ const route = useRoute();
 const router = useRouter();
 
 const sectionItems: TabsItem[] = [
-  { label: 'Задачи', value: ROUTES.home },
+  { label: 'Задачи', value: ROUTES.tasks },
   { label: 'Чат', value: ROUTES.messenger },
 ];
 
 const section = computed({
-  get: () => (route.path.startsWith(ROUTES.messenger) ? ROUTES.messenger : ROUTES.home),
+  get: () => (route.path.startsWith(ROUTES.messenger) ? ROUTES.messenger : ROUTES.tasks),
   set: value => router.push(value),
 });
 

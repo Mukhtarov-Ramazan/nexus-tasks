@@ -5,9 +5,13 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: ROUTES.home,
-      name: 'home',
-      component: () => import('@/pages/home').then(m => m.HomePage),
+      path: '/',
+      redirect: ROUTES.tasks,
+    },
+    {
+      path: ROUTES.tasks,
+      name: 'tasks',
+      component: () => import('@/pages/tasks').then(m => m.TasksPage),
       meta: { layout: 'default' },
     },
     {
