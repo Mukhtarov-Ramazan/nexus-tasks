@@ -9,7 +9,7 @@ const router = createRouter({
       redirect: ROUTES.tasks,
     },
     {
-      path: ROUTES.tasks,
+      path: `${ROUTES.tasks}/:taskId?`,
       name: 'tasks',
       component: () => import('@/pages/tasks').then(m => m.TasksPage),
       meta: { layout: 'default' },

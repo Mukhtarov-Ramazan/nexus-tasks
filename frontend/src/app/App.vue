@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { RouterView, useRoute } from 'vue-router';
+import { ru } from '@nuxt/ui/locale';
 import { layouts } from '@/layouts';
 
 const route = useRoute();
@@ -9,7 +10,7 @@ const currentLayout = computed(() => layouts[route.meta.layout ?? 'default']);
 </script>
 
 <template>
-  <UApp>
+  <UApp :locale="ru">
     <component :is="currentLayout">
       <RouterView />
     </component>

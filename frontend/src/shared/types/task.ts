@@ -11,6 +11,11 @@ export interface TaskAssignee {
 export interface Task {
   id: string;
   title: string;
+  /** Описание в формате markdown */
+  description?: string;
+  /** Название колонки канбан-доски */
+  status: string;
+  files?: TaskFile[];
   assignees: TaskAssignee[];
   priority: TaskPriority;
   complexity: TaskComplexity;
@@ -21,4 +26,14 @@ export interface Task {
   /** Затрачено часов */
   spentHours: number;
   type: TaskType;
+}
+
+export interface TaskFile {
+  id: string;
+  name: string;
+  /** Размер в байтах */
+  size: number;
+  mimeType: string;
+  /** Пока нет бэкенда — blob-URL, живёт до перезагрузки страницы */
+  url: string;
 }
