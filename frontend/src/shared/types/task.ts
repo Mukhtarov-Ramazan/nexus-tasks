@@ -17,6 +17,8 @@ export interface Task {
   status: string;
   files?: TaskFile[];
   assignees: TaskAssignee[];
+  /** Наблюдатели; по умолчанию — автор задачи */
+  watchers?: TaskAssignee[];
   priority: TaskPriority;
   complexity: TaskComplexity;
   /** ISO-дата дедлайна */

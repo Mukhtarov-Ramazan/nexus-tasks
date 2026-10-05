@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { complexityMap, mockUsers, priorityMap, taskStatuses, typeMap } from '@/shared/config';
+import { useToast } from '@nuxt/ui/composables';
+import {
+  complexityMap,
+  mockUsers,
+  priorityMap,
+  ROUTES,
+  taskStatuses,
+  typeMap,
+} from '@/shared/config';
 import { formatHours } from '@/shared/lib/time';
 import type { Task, TaskFile } from '@/shared/types/task';
 import TaskDescriptionEditor from './TaskDescriptionEditor.vue';
@@ -28,6 +36,50 @@ const commitTitle = () => {
   editingTitle.value = false;
 };
 
+const toast = useToast();
+
+const copy = async (write: () => Promise<void>) => {
+  try {
+    await write();
+    toast.add({ title: 'Скопировано', icon: 'i-lucide-check', color: 'success' });
+  } catch {
+    toast.add({ title: 'Не удалось скопировать', color: 'error' });
+  }
+};
+
+const titleWithId = () => `${props.task?.id} ${props.task?.title}`;
+
+const escapeHtml = (value: string) =>
+  value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+// Название-гиперссылка: text/html для документов и чатов, text/plain (ссылка) как запасной вариант
+const writeTitleLink = () => {
+  const { id } = props.task!;
+  const url = `${window.location.origin}${ROUTES.tasks}/${id}`;
+  const label = titleWithId();
+  const html = `<a href="${escapeHtml(url)}">${escapeHtml(label)}</a>`;
+  return navigator.clipboard.write([
+    new ClipboardItem({
+      'text/html': new Blob([html], { type: 'text/html' }),
+      'text/plain': new Blob([`${label} ${url}`], { type: 'text/plain' }),
+    }),
+  ]);
+};
+
+const titleMenuItems = computed(() => [
+  {
+    label: 'Скопировать название',
+    icon: 'i-lucide-copy',
+    onSelect: () => copy(() => navigator.clipboard.writeText(titleWithId())),
+  },
+  {
+    label: 'Скопировать название и ссылку',
+    icon: 'i-lucide-link',
+    onSelect: () => copy(writeTitleLink),
+  },
+  { label: 'Редактировать', icon: 'i-lucide-pencil', onSelect: startTitleEdit },
+]);
+
 const patch = (value: Partial<Task>) => {
   if (props.task) emit('update', props.task.id, value);
 };
@@ -40,11 +92,30 @@ const priorityItems = toItems(priorityMap);
 const complexityItems = toItems(complexityMap);
 const typeItems = toItems(typeMap);
 
-const availableUsers = computed(() =>
+type PeopleField = 'assignees' | 'watchers';
+
+const peopleSections: { field: PeopleField; title: string; placeholder: string; remove: string }[] =
+  [
+    {
+      field: 'assignees',
+      title: 'Исполнители',
+      placeholder: 'Добавить исполнителя',
+      remove: 'Убрать исполнителя',
+    },
+    {
+      field: 'watchers',
+      title: 'Наблюдатели',
+      placeholder: 'Добавить наблюдателя',
+      remove: 'Убрать наблюдателя',
+    },
+  ];
+
+const peopleOf = (field: PeopleField) => props.task?.[field] ?? [];
+
+const availableUsers = (field: PeopleField) =>
   mockUsers
-    .filter(u => !props.task?.assignees.some(a => a.id === u.id))
-    .map(u => ({ value: u.id, label: u.fullName, avatar: { alt: u.fullName } }))
-);
+    .filter(u => !peopleOf(field).some(p => p.id === u.id))
+    .map(u => ({ value: u.id, label: u.fullName, avatar: { alt: u.fullName } }));
 
 const addFiles = (files: TaskFile[]) => {
   if (props.task) patch({ files: [...(props.task.files ?? []), ...files] });
@@ -88,13 +159,13 @@ const updateDescription = (value: string) => {
   });
 };
 
-const addAssignee = (id: string | null) => {
+const addPerson = (field: PeopleField, id: string | null) => {
   const user = mockUsers.find(u => u.id === id);
-  if (user && props.task) patch({ assignees: [...props.task.assignees, user] });
+  if (user && props.task) patch({ [field]: [...peopleOf(field), user] });
 };
 
-const removeAssignee = (id: string) => {
-  if (props.task) patch({ assignees: props.task.assignees.filter(a => a.id !== id) });
+const removePerson = (field: PeopleField, id: string) => {
+  if (props.task) patch({ [field]: peopleOf(field).filter(p => p.id !== id) });
 };
 
 const isOverdue = computed(
@@ -151,15 +222,16 @@ const isOverspent = computed(
         />
         <template v-else>
           <span class="min-w-0">{{ task?.title }}</span>
-          <UButton
-            icon="i-lucide-pencil"
-            color="neutral"
-            variant="ghost"
-            size="xs"
-            aria-label="Редактировать название"
-            class="shrink-0 opacity-0 transition-opacity focus-visible:opacity-100 group-hover:opacity-100"
-            @click="startTitleEdit"
-          />
+          <UDropdownMenu :items="titleMenuItems" :content="{ align: 'start' }">
+            <UButton
+              icon="i-lucide-ellipsis"
+              color="neutral"
+              variant="ghost"
+              size="xs"
+              aria-label="Действия с названием"
+              class="shrink-0"
+            />
+          </UDropdownMenu>
         </template>
       </span>
     </template>
@@ -260,39 +332,43 @@ const isOverspent = computed(
             <TaskTimer :key="task.id" @add="patch({ spentHours: task.spentHours + $event })" />
           </div>
 
-          <div class="flex flex-col gap-2 border-t border-default pt-4">
-            <span class="text-xs text-muted">Исполнители</span>
+          <div
+            v-for="section in peopleSections"
+            :key="section.field"
+            class="flex flex-col gap-2 border-t border-default pt-4"
+          >
+            <span class="text-xs text-muted">{{ section.title }}</span>
 
             <ul class="flex flex-col gap-1.5">
               <li
-                v-for="assignee in task.assignees"
-                :key="assignee.id"
+                v-for="person in peopleOf(section.field)"
+                :key="person.id"
                 class="flex items-center gap-2"
               >
-                <UAvatar :src="assignee.avatarUrl" :alt="assignee.fullName" size="xs" />
-                <span class="min-w-0 flex-1 truncate text-sm" :title="assignee.fullName">
-                  {{ assignee.fullName }}
+                <UAvatar :src="person.avatarUrl" :alt="person.fullName" size="xs" />
+                <span class="min-w-0 flex-1 truncate text-sm" :title="person.fullName">
+                  {{ person.fullName }}
                 </span>
                 <UButton
                   icon="i-lucide-x"
                   color="neutral"
                   variant="ghost"
                   size="xs"
-                  aria-label="Убрать исполнителя"
-                  @click="removeAssignee(assignee.id)"
+                  :aria-label="section.remove"
+                  @click="removePerson(section.field, person.id)"
                 />
               </li>
             </ul>
 
             <USelectMenu
               :model-value="undefined"
-              :items="availableUsers"
+              :items="availableUsers(section.field)"
               value-key="value"
-              placeholder="Добавить исполнителя"
+              :placeholder="section.placeholder"
               icon="i-lucide-user-plus"
               :search-input="{ placeholder: 'Поиск…' }"
               class="w-full"
-              @update:model-value="addAssignee"
+              @update:model-value="addPerson(section.field, $event)"
             />
           </div>
         </aside>

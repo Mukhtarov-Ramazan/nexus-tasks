@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { createTaskFile } from '../model/createTaskFile';
 import FilePickerButton from './FilePickerButton.vue';
 import type { TaskFile } from '@/shared/types/task';
@@ -20,6 +20,38 @@ const insertImages = (editor: Editor, files: File[]) => {
 
 const linkOpen = ref(false);
 const linkUrl = ref('');
+
+// Сворачивание длинного описания
+const COLLAPSED_MAX_PX = 320;
+const root = ref<HTMLElement | null>(null);
+const expanded = ref(false);
+const overflowing = ref(false);
+const collapsedClass =
+  'h-auto ' +
+  'max-h-80 overflow-hidden [mask-image:linear-gradient(to_bottom,#000_calc(100%-3rem),transparent)]';
+
+const checkOverflow = () => {
+  const content = root.value?.querySelector<HTMLElement>('.ProseMirror');
+  // Ограничение высоты стоит на обёртке, поэтому .ProseMirror всегда имеет полную высоту
+  overflowing.value = !!content && content.offsetHeight > COLLAPSED_MAX_PX + 1;
+};
+
+let mutationObserver: MutationObserver | undefined;
+let resizeObserver: ResizeObserver | undefined;
+
+onMounted(() => {
+  if (!root.value) return;
+  mutationObserver = new MutationObserver(checkOverflow);
+  mutationObserver.observe(root.value, { childList: true, subtree: true, characterData: true });
+  resizeObserver = new ResizeObserver(checkOverflow);
+  resizeObserver.observe(root.value);
+  checkOverflow();
+});
+
+onBeforeUnmount(() => {
+  mutationObserver?.disconnect();
+  resizeObserver?.disconnect();
+});
 
 const toolbarItems: EditorToolbarItem[][] = [
   [
@@ -60,63 +92,76 @@ const removeLink = (editor: Editor) => {
 </script>
 
 <template>
-  <UEditor
-    v-slot="{ editor }"
-    v-model="model"
-    content-type="markdown"
-    placeholder="Добавьте описание задачи…"
-    class="editor w-full flex-none shrink-0 min-h-64 rounded-md border border-default"
-    :ui="{ base: 'p-3 sm:px-3' }"
-  >
-    <div class="flex items-center gap-1 border-b border-default px-2 py-1">
-      <UEditorToolbar :editor="editor" :items="toolbarItems" />
+  <div ref="root" class="flex w-full shrink-0 flex-col gap-1">
+    <UEditor
+      v-slot="{ editor }"
+      v-model="model"
+      content-type="markdown"
+      placeholder="Добавьте описание задачи…"
+      class="editor w-full flex-none shrink-0 min-h-64 rounded-md border border-default"
+      :ui="{ base: 'p-3 sm:px-3', content: overflowing && !expanded ? collapsedClass : 'h-auto' }"
+    >
+      <div class="flex items-center gap-1 border-b border-default px-2 py-1">
+        <UEditorToolbar :editor="editor" :items="toolbarItems" />
 
-      <UPopover v-model:open="linkOpen" @update:open="onLinkToggle($event, editor)">
-        <UButton
-          icon="i-lucide-link"
-          color="neutral"
-          :variant="editor.isActive('link') ? 'soft' : 'ghost'"
-          size="sm"
-          aria-label="Ссылка"
+        <UPopover v-model:open="linkOpen" @update:open="onLinkToggle($event, editor)">
+          <UButton
+            icon="i-lucide-link"
+            color="neutral"
+            :variant="editor.isActive('link') ? 'soft' : 'ghost'"
+            size="sm"
+            aria-label="Ссылка"
+          />
+          <template #content>
+            <div class="flex items-center gap-1 p-2">
+              <UInput
+                v-model="linkUrl"
+                placeholder="https://…"
+                size="sm"
+                class="w-64"
+                autofocus
+                @keydown.enter.prevent="applyLink(editor)"
+              />
+              <UButton
+                icon="i-lucide-check"
+                size="sm"
+                aria-label="Применить"
+                @click="applyLink(editor)"
+              />
+              <UButton
+                v-if="editor.isActive('link')"
+                icon="i-lucide-unlink"
+                color="neutral"
+                variant="ghost"
+                size="sm"
+                aria-label="Убрать ссылку"
+                @click="removeLink(editor)"
+              />
+            </div>
+          </template>
+        </UPopover>
+
+        <FilePickerButton
+          icon="i-lucide-image"
+          accept="image/*"
+          variant="ghost"
+          aria-label="Вставить изображение"
+          @picked="insertImages(editor, $event)"
         />
-        <template #content>
-          <div class="flex items-center gap-1 p-2">
-            <UInput
-              v-model="linkUrl"
-              placeholder="https://…"
-              size="sm"
-              class="w-64"
-              autofocus
-              @keydown.enter.prevent="applyLink(editor)"
-            />
-            <UButton
-              icon="i-lucide-check"
-              size="sm"
-              aria-label="Применить"
-              @click="applyLink(editor)"
-            />
-            <UButton
-              v-if="editor.isActive('link')"
-              icon="i-lucide-unlink"
-              color="neutral"
-              variant="ghost"
-              size="sm"
-              aria-label="Убрать ссылку"
-              @click="removeLink(editor)"
-            />
-          </div>
-        </template>
-      </UPopover>
+      </div>
+    </UEditor>
 
-      <FilePickerButton
-        icon="i-lucide-image"
-        accept="image/*"
-        variant="ghost"
-        aria-label="Вставить изображение"
-        @picked="insertImages(editor, $event)"
-      />
-    </div>
-  </UEditor>
+    <UButton
+      v-if="overflowing || expanded"
+      :icon="expanded ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
+      :label="expanded ? 'Свернуть' : 'Развернуть'"
+      color="neutral"
+      variant="ghost"
+      size="xs"
+      class="relative z-10 self-start"
+      @click="expanded = !expanded"
+    />
+  </div>
 </template>
 
 <style scoped>
