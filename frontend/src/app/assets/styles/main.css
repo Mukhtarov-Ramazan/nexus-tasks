@@ -19,6 +19,12 @@
   --ui-border: var(--color-neutral-800);
 }
 
+/* Единый тонкий скролл во всех браузерах */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(115 115 115 / 0.45) transparent;
+}
+
 @theme {
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;

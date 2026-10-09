@@ -6,12 +6,13 @@ import {
   mockUsers,
   priorityMap,
   ROUTES,
-  taskStatuses,
+  statusMap,
   typeMap,
 } from '@/shared/config';
 import { formatHours } from '@/shared/lib/time';
 import type { Task, TaskFile } from '@/shared/types/task';
 import TaskDescriptionEditor from './TaskDescriptionEditor.vue';
+import TaskBadgeSelect from './TaskBadgeSelect.vue';
 import TaskDeadline from './TaskDeadline.vue';
 import TaskFiles from './TaskFiles.vue';
 import TaskTimer from './TaskTimer.vue';
@@ -84,13 +85,12 @@ const patch = (value: Partial<Task>) => {
   if (props.task) emit('update', props.task.id, value);
 };
 
-const toItems = (map: Record<string, { label: string; icon?: string }>) =>
-  Object.entries(map).map(([value, { label, icon }]) => ({ value, label, icon }));
-
-const statusItems = taskStatuses.map(s => ({ value: s, label: s }));
-const priorityItems = toItems(priorityMap);
-const complexityItems = toItems(complexityMap);
-const typeItems = toItems(typeMap);
+const selectFields = [
+  { key: 'status', title: 'Статус', options: statusMap, variant: 'subtle' },
+  { key: 'priority', title: 'Приоритет', options: priorityMap, variant: 'subtle' },
+  { key: 'complexity', title: 'Сложность', options: complexityMap, variant: 'subtle' },
+  { key: 'type', title: 'Тип', options: typeMap, variant: 'subtle' },
+] as const;
 
 type PeopleField = 'assignees' | 'watchers';
 
@@ -261,43 +261,13 @@ const isOverspent = computed(
         <aside
           class="flex min-w-0 flex-col gap-4 overflow-y-auto border-l border-default p-4 sm:p-6"
         >
-          <div class="flex flex-col gap-1.5">
-            <span class="text-xs text-muted">Статус</span>
-            <USelect
-              :model-value="task.status"
-              :items="statusItems"
-              class="w-full"
-              @update:model-value="patch({ status: $event })"
-            />
-          </div>
-
-          <div class="flex flex-col gap-1.5">
-            <span class="text-xs text-muted">Приоритет</span>
-            <USelect
-              :model-value="task.priority"
-              :items="priorityItems"
-              class="w-full"
-              @update:model-value="patch({ priority: $event as Task['priority'] })"
-            />
-          </div>
-
-          <div class="flex flex-col gap-1.5">
-            <span class="text-xs text-muted">Сложность</span>
-            <USelect
-              :model-value="task.complexity"
-              :items="complexityItems"
-              class="w-full"
-              @update:model-value="patch({ complexity: $event as Task['complexity'] })"
-            />
-          </div>
-
-          <div class="flex flex-col gap-1.5">
-            <span class="text-xs text-muted">Тип</span>
-            <USelect
-              :model-value="task.type"
-              :items="typeItems"
-              class="w-full"
-              @update:model-value="patch({ type: $event as Task['type'] })"
+          <div v-for="field in selectFields" :key="field.key" class="flex flex-col gap-1.5">
+            <span class="text-xs text-muted">{{ field.title }}</span>
+            <TaskBadgeSelect
+              :model-value="task[field.key]"
+              :options="field.options"
+              :variant="field.variant"
+              @update:model-value="patch({ [field.key]: $event })"
             />
           </div>
 

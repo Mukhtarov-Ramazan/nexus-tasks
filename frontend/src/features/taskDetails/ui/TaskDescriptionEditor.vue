@@ -55,17 +55,26 @@ onBeforeUnmount(() => {
 
 const toolbarItems: EditorToolbarItem[][] = [
   [
-    { kind: 'mark', mark: 'bold', icon: 'i-lucide-bold' },
-    { kind: 'mark', mark: 'italic', icon: 'i-lucide-italic' },
-    { kind: 'mark', mark: 'strike', icon: 'i-lucide-strikethrough' },
-    { kind: 'mark', mark: 'code', icon: 'i-lucide-code' },
+    { kind: 'mark', mark: 'bold', icon: 'i-lucide-bold', tooltip: { text: 'Жирный' } },
+    { kind: 'mark', mark: 'italic', icon: 'i-lucide-italic', tooltip: { text: 'Курсив' } },
+    {
+      kind: 'mark',
+      mark: 'strike',
+      icon: 'i-lucide-strikethrough',
+      tooltip: { text: 'Зачёркнутый' },
+    },
+    { kind: 'mark', mark: 'code', icon: 'i-lucide-code', tooltip: { text: 'Код в строке' } },
   ],
   [
-    { kind: 'heading', level: 2, icon: 'i-lucide-heading-2' },
-    { kind: 'bulletList', icon: 'i-lucide-list' },
-    { kind: 'orderedList', icon: 'i-lucide-list-ordered' },
-    { kind: 'blockquote', icon: 'i-lucide-text-quote' },
-    { kind: 'codeBlock', icon: 'i-lucide-square-code' },
+    { kind: 'heading', level: 2, icon: 'i-lucide-heading-2', tooltip: { text: 'Заголовок' } },
+    { kind: 'bulletList', icon: 'i-lucide-list', tooltip: { text: 'Маркированный список' } },
+    {
+      kind: 'orderedList',
+      icon: 'i-lucide-list-ordered',
+      tooltip: { text: 'Нумерованный список' },
+    },
+    { kind: 'blockquote', icon: 'i-lucide-text-quote', tooltip: { text: 'Цитата' } },
+    { kind: 'codeBlock', icon: 'i-lucide-square-code', tooltip: { text: 'Блок кода' } },
   ],
 ];
 
@@ -105,13 +114,15 @@ const removeLink = (editor: Editor) => {
         <UEditorToolbar :editor="editor" :items="toolbarItems" />
 
         <UPopover v-model:open="linkOpen" @update:open="onLinkToggle($event, editor)">
-          <UButton
-            icon="i-lucide-link"
-            color="neutral"
-            :variant="editor.isActive('link') ? 'soft' : 'ghost'"
-            size="sm"
-            aria-label="Ссылка"
-          />
+          <UTooltip text="Ссылка">
+            <UButton
+              icon="i-lucide-link"
+              color="neutral"
+              :variant="editor.isActive('link') ? 'soft' : 'ghost'"
+              size="sm"
+              aria-label="Ссылка"
+            />
+          </UTooltip>
           <template #content>
             <div class="flex items-center gap-1 p-2">
               <UInput
@@ -141,13 +152,15 @@ const removeLink = (editor: Editor) => {
           </template>
         </UPopover>
 
-        <FilePickerButton
-          icon="i-lucide-image"
-          accept="image/*"
-          variant="ghost"
-          aria-label="Вставить изображение"
-          @picked="insertImages(editor, $event)"
-        />
+        <UTooltip text="Вставить изображение">
+          <FilePickerButton
+            icon="i-lucide-image"
+            accept="image/*"
+            variant="ghost"
+            aria-label="Вставить изображение"
+            @picked="insertImages(editor, $event)"
+          />
+        </UTooltip>
       </div>
     </UEditor>
 

@@ -23,8 +23,14 @@ export const typeMap: Record<TaskType, { label: string; color: BadgeColor; icon:
   chore: { label: 'Рутина', color: 'neutral', icon: 'i-lucide-wrench' },
 };
 
-/** Временный список колонок канбан-доски (доски пока нет) */
-export const taskStatuses = ['Backlog', 'К выполнению', 'В работе', 'На ревью', 'Готово'];
+/** Временный список колонок канбан-доски (доски пока нет); цвета — тестовые, потом задаются для колонки */
+export const statusMap: Record<string, { label: string; color: BadgeColor }> = {
+  Backlog: { label: 'Backlog', color: 'neutral' },
+  'К выполнению': { label: 'К выполнению', color: 'info' },
+  'В работе': { label: 'В работе', color: 'warning' },
+  'На ревью': { label: 'На ревью', color: 'secondary' },
+  Готово: { label: 'Готово', color: 'success' },
+};
 
 /** Временный список сотрудников компании */
 export const mockUsers = [
