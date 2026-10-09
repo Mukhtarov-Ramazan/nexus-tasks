@@ -1,49 +1,30 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { formatClock, parseClock } from '@/shared/lib/time';
+import { useTimerStore } from '@/stores/timer';
 
+const props = defineProps<{ taskId: string }>();
 const emit = defineEmits<{ add: [hours: number] }>();
 
-const baseSeconds = ref(0);
-const startedAt = ref<number | null>(null);
-const now = ref(Date.now());
+const timer = useTimerStore();
 const inputKey = ref(0);
-let timerId: ReturnType<typeof setInterval> | undefined;
 
-const running = computed(() => startedAt.value !== null);
-const seconds = computed(
-  () => baseSeconds.value + (startedAt.value ? Math.floor((now.value - startedAt.value) / 1000) : 0)
-);
+const running = computed(() => timer.isRunning(props.taskId));
+const seconds = computed(() => timer.seconds(props.taskId));
 
-const start = () => {
-  now.value = startedAt.value = Date.now();
-  timerId = setInterval(() => (now.value = Date.now()), 500);
-};
-
-const pause = () => {
-  baseSeconds.value = seconds.value;
-  startedAt.value = null;
-  clearInterval(timerId);
-};
+const start = () => timer.start(props.taskId);
+const pause = () => timer.pause(props.taskId);
 
 const commit = () => {
-  const total = seconds.value;
-  pause();
-  baseSeconds.value = 0;
+  const total = timer.reset(props.taskId);
   if (total > 0) emit('add', total / 3600);
 };
 
 const onManualInput = (event: Event) => {
   const parsed = parseClock((event.target as HTMLInputElement).value);
-  if (parsed !== null) baseSeconds.value = parsed;
+  if (parsed !== null) timer.setSeconds(props.taskId, parsed);
   inputKey.value++; // перерисовать поле отформатированным значением
 };
-
-// Если панель закрыли при работающем таймере — не теряем время
-onBeforeUnmount(() => {
-  if (running.value) commit();
-  else clearInterval(timerId);
-});
 </script>
 
 <template>

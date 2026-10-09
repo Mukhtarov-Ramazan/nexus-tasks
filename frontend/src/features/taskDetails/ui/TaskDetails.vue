@@ -318,7 +318,7 @@ const isOverspent = computed(
               </span>
             </div>
 
-            <TaskTimer :key="task.id" @add="patch({ spentHours: task.spentHours + $event })" />
+            <TaskTimer :key="task.id" :task-id="task.id" @add="patch({ spentHours: task.spentHours + $event })" />
           </div>
 
           <div
