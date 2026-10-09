@@ -2,12 +2,14 @@
 import { computed } from 'vue';
 import type { BadgeColor } from '@/shared/config/taskMeta';
 
-type Option = { label: string; color: BadgeColor; icon?: string };
+/** dot — класс фона цветной точки (для цветов, которых нет среди цветов бейджа) */
+type Option = { label: string; color: BadgeColor; icon?: string; dot?: string };
 
 const props = defineProps<{
   modelValue: string;
   options: Record<string, Option>;
-  variant: 'subtle' | 'outline' | 'soft';}>();
+  variant: 'subtle' | 'outline' | 'soft';
+}>();
 const emit = defineEmits<{ 'update:modelValue': [value: string] }>();
 
 const items = computed(() =>
@@ -31,6 +33,11 @@ const items = computed(() =>
         :variant="variant"
         size="sm"
       >
+        <span
+          v-if="options[modelValue].dot"
+          class="size-2 rounded-full"
+          :class="options[modelValue].dot"
+        />
         {{ options[modelValue].label }}
       </UBadge>
     </template>
@@ -41,6 +48,11 @@ const items = computed(() =>
         :variant="variant"
         size="sm"
       >
+        <span
+          v-if="options[(item as { value: string }).value]?.dot"
+          class="size-2 rounded-full"
+          :class="options[(item as { value: string }).value]?.dot"
+        />
         {{ options[(item as { value: string }).value]?.label }}
       </UBadge>
     </template>

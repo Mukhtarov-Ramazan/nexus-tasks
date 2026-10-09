@@ -2,14 +2,16 @@
 import { computed, ref } from 'vue';
 import { useToast } from '@nuxt/ui/composables';
 import {
+  columnColors,
   complexityMap,
+  defaultColumnColor,
   mockUsers,
   priorityMap,
   ROUTES,
-  statusMap,
   typeMap,
 } from '@/shared/config';
 import { formatHours } from '@/shared/lib/time';
+import type { KanbanColumn } from '@/shared/types/column';
 import type { Task, TaskFile } from '@/shared/types/task';
 import TaskDescriptionEditor from './TaskDescriptionEditor.vue';
 import TaskBadgeSelect from './TaskBadgeSelect.vue';
@@ -17,7 +19,7 @@ import TaskDeadline from './TaskDeadline.vue';
 import TaskFiles from './TaskFiles.vue';
 import TaskTimer from './TaskTimer.vue';
 
-const props = defineProps<{ task: Task | null }>();
+const props = defineProps<{ task: Task | null; columns: KanbanColumn[] }>();
 const open = defineModel<boolean>('open', { default: false });
 const emit = defineEmits<{ update: [id: string, patch: Partial<Task>] }>();
 
@@ -85,12 +87,29 @@ const patch = (value: Partial<Task>) => {
   if (props.task) emit('update', props.task.id, value);
 };
 
-const selectFields = [
-  { key: 'status', title: 'Статус', options: statusMap, variant: 'subtle' },
-  { key: 'priority', title: 'Приоритет', options: priorityMap, variant: 'subtle' },
-  { key: 'complexity', title: 'Сложность', options: complexityMap, variant: 'subtle' },
-  { key: 'type', title: 'Тип', options: typeMap, variant: 'subtle' },
-] as const;
+// Статусы — колонки доски; цвет колонки показываем точкой
+const statusOptions = computed(() =>
+  Object.fromEntries(
+    props.columns.map(c => [
+      c.id,
+      {
+        label: c.title,
+        color: 'neutral' as const,
+        dot: (columnColors[c.color] ?? columnColors[defaultColumnColor]).bg,
+      },
+    ])
+  )
+);
+
+const selectFields = computed(
+  () =>
+    [
+      { key: 'status', title: 'Статус', options: statusOptions.value, variant: 'subtle' },
+      { key: 'priority', title: 'Приоритет', options: priorityMap, variant: 'subtle' },
+      { key: 'complexity', title: 'Сложность', options: complexityMap, variant: 'subtle' },
+      { key: 'type', title: 'Тип', options: typeMap, variant: 'subtle' },
+    ] as const
+);
 
 type PeopleField = 'assignees' | 'watchers';
 

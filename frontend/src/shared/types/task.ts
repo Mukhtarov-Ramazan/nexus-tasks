@@ -13,7 +13,7 @@ export interface Task {
   title: string;
   /** Описание в формате markdown */
   description?: string;
-  /** Название колонки канбан-доски */
+  /** Id колонки канбан-доски */
   status: string;
   files?: TaskFile[];
   assignees: TaskAssignee[];
