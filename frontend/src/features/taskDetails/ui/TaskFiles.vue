@@ -13,7 +13,7 @@ const addFiles = (picked: File[]) => emit('add', picked.map(createTaskFile));
 <template>
   <div class="flex flex-col gap-3">
     <div class="flex items-center justify-between">
-      <span class="text-sm font-medium">Файлы</span>
+      <span class="text-base font-semibold">Файлы</span>
       <FilePickerButton icon="i-lucide-paperclip" label="Добавить файл" @picked="addFiles" />
     </div>
 
@@ -46,7 +46,7 @@ const addFiles = (picked: File[]) => emit('add', picked.map(createTaskFile));
           icon="i-lucide-download"
           color="neutral"
           variant="solid"
-          size="xs"
+          size="md"
           :href="file.url"
           :download="file.name"
           aria-label="Скачать файл"
@@ -57,7 +57,7 @@ const addFiles = (picked: File[]) => emit('add', picked.map(createTaskFile));
           icon="i-lucide-trash-2"
           color="neutral"
           variant="solid"
-          size="xs"
+          size="md"
           aria-label="Удалить файл"
           class="absolute top-1.5 right-1.5 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
           @click="emit('remove', file.id)"

@@ -119,7 +119,7 @@ const removeLink = (editor: Editor) => {
               icon="i-lucide-link"
               color="neutral"
               :variant="editor.isActive('link') ? 'soft' : 'ghost'"
-              size="sm"
+              size="md"
               aria-label="Ссылка"
             />
           </UTooltip>
@@ -135,7 +135,7 @@ const removeLink = (editor: Editor) => {
               />
               <UButton
                 icon="i-lucide-check"
-                size="sm"
+                size="md"
                 aria-label="Применить"
                 @click="applyLink(editor)"
               />
@@ -144,7 +144,7 @@ const removeLink = (editor: Editor) => {
                 icon="i-lucide-unlink"
                 color="neutral"
                 variant="ghost"
-                size="sm"
+                size="md"
                 aria-label="Убрать ссылку"
                 @click="removeLink(editor)"
               />

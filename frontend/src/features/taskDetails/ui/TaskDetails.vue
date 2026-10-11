@@ -224,7 +224,7 @@ const isOverspent = computed(
           :icon="expanded ? 'i-lucide-minimize-2' : 'i-lucide-maximize-2'"
           color="neutral"
           variant="ghost"
-          size="xs"
+          size="md"
           :aria-label="expanded ? 'Свернуть' : 'Развернуть на всю ширину'"
           @click="expanded = !expanded"
         />
@@ -256,7 +256,7 @@ const isOverspent = computed(
               icon="i-lucide-ellipsis"
               color="neutral"
               variant="ghost"
-              size="xs"
+              size="md"
               aria-label="Действия с названием"
               class="shrink-0"
             />
@@ -291,14 +291,14 @@ const isOverspent = computed(
           />
 
           <TaskFiles
-            class="shrink-0"
+            class="shrink-0 border-t border-default pt-4"
             :files="task.files ?? []"
             @add="addFiles"
             @remove="removeFile"
           />
 
           <TaskSubtasks
-            class="shrink-0"
+            class="shrink-0 border-t border-default pt-4"
             :subtasks="subtasks ?? []"
             :columns="columns"
             @create="emit('create-subtask', task.id, $event)"
@@ -320,7 +320,7 @@ const isOverspent = computed(
             />
           </div>
 
-          <div class="flex flex-col gap-1.5">
+          <div class="flex flex-col gap-1.5 border-t border-default pt-4">
             <span class="text-xs text-muted">Дедлайн</span>
             <TaskDeadline
               :model-value="task.dueDate"
@@ -372,7 +372,7 @@ const isOverspent = computed(
                   icon="i-lucide-x"
                   color="neutral"
                   variant="ghost"
-                  size="xs"
+                  size="md"
                   :aria-label="section.remove"
                   @click="removePerson(section.field, person.id)"
                 />

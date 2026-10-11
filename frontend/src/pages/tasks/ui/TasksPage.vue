@@ -83,7 +83,7 @@ const confirmDelete = () => {
           icon="i-lucide-plus"
           color="neutral"
           variant="outline"
-          size="sm"
+          size="md"
           aria-label="Создать колонку"
           @click="openCreate"
         />

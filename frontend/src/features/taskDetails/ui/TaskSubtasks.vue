@@ -30,13 +30,13 @@ const dotClass = (status: string) =>
 <template>
   <div class="flex flex-col gap-3">
     <div class="flex items-center justify-between">
-      <span class="text-sm font-medium">Подзадачи</span>
+      <span class="text-base font-semibold">Подзадачи</span>
       <UButton
-        icon="i-lucide-plus"
+        icon="i-lucide-list-plus"
+        label="Добавить подзадачу"
         color="neutral"
-        variant="ghost"
-        size="xs"
-        aria-label="Добавить подзадачу"
+        variant="outline"
+        size="sm"
         @click="startAdding"
       />
     </div>

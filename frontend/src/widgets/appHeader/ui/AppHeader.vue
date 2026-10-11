@@ -55,7 +55,7 @@ const userMenu: DropdownMenuItem[][] = [
             icon="i-lucide-pause"
             color="error"
             variant="soft"
-            size="xs"
+            size="md"
             aria-label="Остановить и записать время"
             @click.stop="stopAndCommit(activeTask)"
           />
