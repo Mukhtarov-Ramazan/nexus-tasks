@@ -1,5 +1,6 @@
 import { computed, ref, watch } from 'vue';
 import { defineStore } from 'pinia';
+import { readStorage, writeStorage } from '@/shared/lib/storage';
 
 interface TimerEntry {
   baseSeconds: number;
@@ -8,13 +9,7 @@ interface TimerEntry {
 
 const STORAGE_KEY = 'nexus-tasks:timers';
 
-const load = (): Record<string, TimerEntry> => {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}');
-  } catch {
-    return {};
-  }
-};
+const load = () => readStorage<Record<string, TimerEntry>>(STORAGE_KEY, {});
 
 /** Таймеры задач живут вне компонентов, хранятся в localStorage и синхронизируются между вкладками */
 export const useTimerStore = defineStore('timer', () => {
@@ -41,17 +36,7 @@ export const useTimerStore = defineStore('timer', () => {
     { immediate: true }
   );
 
-  watch(
-    entries,
-    value => {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
-      } catch {
-        // localStorage недоступен — работаем без сохранения
-      }
-    },
-    { deep: true }
-  );
+  watch(entries, value => writeStorage(STORAGE_KEY, value), { deep: true });
 
   window.addEventListener('storage', event => {
     if (event.key === STORAGE_KEY) entries.value = load();

@@ -22,12 +22,3 @@ export const typeMap: Record<TaskType, { label: string; color: BadgeColor; icon:
   improvement: { label: 'Улучшение', color: 'info', icon: 'i-lucide-trending-up' },
   chore: { label: 'Рутина', color: 'neutral', icon: 'i-lucide-wrench' },
 };
-
-/** Временный список сотрудников компании */
-export const mockUsers = [
-  { id: '1', fullName: 'Мухтаров Рамазан Ильясович' },
-  { id: '2', fullName: 'Иванов Иван Иванович' },
-  { id: '3', fullName: 'Петрова Анна Сергеевна' },
-  { id: '4', fullName: 'Сидоров Алексей Петрович' },
-  { id: '5', fullName: 'Кузнецова Мария Андреевна' },
-];

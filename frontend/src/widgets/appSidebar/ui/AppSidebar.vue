@@ -37,7 +37,7 @@ const sidebarItems: NavigationMenuItem[] = [
         color="neutral"
         class="w-full"
         :ui="{
-          indicator: 'bg-indigo-600',
+          indicator: 'bg-secondary',
           list: 'grid grid-flow-col auto-cols-fr',
           trigger: 'justify-center data-[state=active]:text-white',
         }"

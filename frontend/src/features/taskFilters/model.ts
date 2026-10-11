@@ -1,3 +1,4 @@
+import { isPast } from '@/shared/lib/time';
 import type { Task, TaskComplexity, TaskPriority, TaskType } from '@/shared/types/task';
 
 export interface TaskFilters {
@@ -30,8 +31,13 @@ export const matchesFilters = (task: Task, f: TaskFilters) => {
   if (f.complexities.length && !f.complexities.includes(task.complexity)) return false;
   if (f.assigneeIds.length && !task.assignees.some(a => f.assigneeIds.includes(a.id))) return false;
   if (f.overdue) {
-    const isOverdue = new Date(task.dueDate).getTime() < Date.now() && task.status !== 'done';
-    if (!isOverdue) return false;
+    if (!isPast(task.dueDate) || task.status === 'done') return false;
   }
   return true;
+};
+
+/** Поиск по названию или номеру задачи; пустой запрос подходит всем */
+export const matchesSearch = (task: Task, query: string) => {
+  const q = query.trim().toLowerCase();
+  return !q || task.title.toLowerCase().includes(q) || task.id.toLowerCase().includes(q);
 };

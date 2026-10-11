@@ -7,6 +7,13 @@ export const formatHours = (hours: number): string => {
   return [h && `${h} ч`, m && `${m} м`].filter(Boolean).join(' ');
 };
 
+/** Дата в прошлом (ISO-строка) */
+export const isPast = (date: string): boolean => new Date(date).getTime() < Date.now();
+
+/** ISO-дата → «01 окт. 2026» */
+export const formatDate = (date: string): string =>
+  new Date(date).toLocaleDateString('ru-RU', { day: '2-digit', month: 'short', year: 'numeric' });
+
 /** Секунды → «HH:MM:SS» */
 export const formatClock = (totalSeconds: number): string => {
   const pad = (n: number) => String(n).padStart(2, '0');

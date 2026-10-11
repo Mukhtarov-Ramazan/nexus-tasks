@@ -4,9 +4,16 @@ import { storeToRefs } from 'pinia';
 import { useRoute, useRouter } from 'vue-router';
 import { ColumnFormModal } from '@/features/columnForm';
 import { TaskDetails } from '@/features/taskDetails';
-import { TaskFilters, countFilters, emptyFilters, matchesFilters } from '@/features/taskFilters';
+import {
+  TaskFilters,
+  countFilters,
+  emptyFilters,
+  matchesFilters,
+  matchesSearch,
+} from '@/features/taskFilters';
 import { KanbanBoard } from '@/widgets/kanbanBoard';
 import { ROUTES } from '@/shared/config';
+import { readStorage, writeStorage } from '@/shared/lib/storage';
 import type { KanbanColumn } from '@/shared/types/column';
 import type { Task } from '@/shared/types/task';
 import { useKanbanStore } from '@/stores/kanban';
@@ -17,18 +24,13 @@ const { columns, tasks, tasksByColumn } = storeToRefs(store);
 // Фильтры: при активных показываем копии списков, перетаскивание отключено
 const filters = ref(emptyFilters());
 const search = ref('');
-const query = computed(() => search.value.trim().toLowerCase());
-const filtersActive = computed(() => countFilters(filters.value) > 0 || !!query.value);
-const matchesSearch = (t: Task) =>
-  !query.value ||
-  t.title.toLowerCase().includes(query.value) ||
-  t.id.toLowerCase().includes(query.value);
+const filtersActive = computed(() => countFilters(filters.value) > 0 || !!search.value.trim());
 const visibleTasksByColumn = computed(() =>
   filtersActive.value
     ? Object.fromEntries(
         Object.entries(tasksByColumn.value).map(([id, list]) => [
           id,
-          list.filter(t => matchesFilters(t, filters.value) && matchesSearch(t)),
+          list.filter(t => matchesFilters(t, filters.value) && matchesSearch(t, search.value)),
         ])
       )
     : tasksByColumn.value
@@ -37,21 +39,8 @@ const visibleTasksByColumn = computed(() =>
 // Вид доски: колонками или списком (запоминаем выбор)
 type BoardView = 'columns' | 'list';
 const VIEW_KEY = 'tasks-view';
-const readView = (): BoardView => {
-  try {
-    return localStorage.getItem(VIEW_KEY) === 'list' ? 'list' : 'columns';
-  } catch {
-    return 'columns';
-  }
-};
-const view = ref<BoardView>(readView());
-watch(view, value => {
-  try {
-    localStorage.setItem(VIEW_KEY, value);
-  } catch {
-    // localStorage недоступен — не страшно
-  }
-});
+const view = ref<BoardView>(readStorage<BoardView>(VIEW_KEY, 'columns'));
+watch(view, value => writeStorage(VIEW_KEY, value));
 
 const route = useRoute();
 const router = useRouter();

@@ -33,19 +33,19 @@ const userMenu: DropdownMenuItem[][] = [
 <template>
   <UHeader class="shrink-0" :ui="{ container: 'max-w-none' }">
     <template #title>
-      <h1 class="font-semibold text-indigo-500">NexusTasks</h1>
+      <h1 class="font-semibold text-secondary">NexusTasks</h1>
     </template>
 
     <template #right>
       <div
         v-if="activeTask"
-        class="flex max-w-xs cursor-pointer items-center gap-2 rounded-md bg-indigo-500/10 py-1 pr-1 pl-3 text-sm hover:bg-indigo-500/20"
+        class="flex max-w-xs cursor-pointer items-center gap-2 rounded-md bg-secondary/10 py-1 pr-1 pl-3 text-sm hover:bg-secondary/20"
         role="button"
         tabindex="0"
         @click="router.push(`${ROUTES.tasks}/${activeTask.id}`)"
         @keydown.enter="router.push(`${ROUTES.tasks}/${activeTask.id}`)"
       >
-        <span class="size-2 shrink-0 animate-pulse rounded-full bg-indigo-500" />
+        <span class="size-2 shrink-0 animate-pulse rounded-full bg-secondary" />
         <span class="truncate">{{ activeTask.id }} {{ activeTask.title }}</span>
         <span class="shrink-0 font-mono tabular-nums">
           {{ formatClock(timer.seconds(activeTask.id)) }}

@@ -42,9 +42,9 @@ const onManualInput = (event: Event) => {
       <UButton
         :icon="running ? 'i-lucide-pause' : 'i-lucide-play'"
         :label="running ? 'Стоп' : 'Старт'"
-        :color="running ? 'error' : 'neutral'"
+        :color="running ? 'error' : 'secondary'"
         :variant="running ? 'soft' : 'solid'"
-        :class="running ? '' : 'bg-indigo-600 text-white hover:bg-indigo-500'"
+        :class="{ 'text-white': !running }"
         size="sm"
         class="flex-1 justify-center"
         @click="running ? pause() : start()"

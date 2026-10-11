@@ -7,12 +7,13 @@ import {
   defaultColumnColor,
   mockUsers,
   priorityMap,
-  ROUTES,
   typeMap,
 } from '@/shared/config';
-import { formatHours } from '@/shared/lib/time';
+import { formatHours, isPast } from '@/shared/lib/time';
 import type { KanbanColumn } from '@/shared/types/column';
-import type { Task, TaskFile } from '@/shared/types/task';
+import type { Task } from '@/shared/types/task';
+import { copyTaskLabel, copyTaskLink } from '../model/taskClipboard';
+import { useTaskAttachments } from '../model/useTaskAttachments';
 import TaskDescriptionEditor from './TaskDescriptionEditor.vue';
 import TaskBadgeSelect from './TaskBadgeSelect.vue';
 import TaskDeadline from './TaskDeadline.vue';
@@ -60,35 +61,16 @@ const copy = async (write: () => Promise<void>) => {
   }
 };
 
-const titleWithId = () => `${props.task?.id} ${props.task?.title}`;
-
-const escapeHtml = (value: string) =>
-  value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-
-// Название-гиперссылка: text/html для документов и чатов, text/plain (ссылка) как запасной вариант
-const writeTitleLink = () => {
-  const { id } = props.task!;
-  const url = `${window.location.origin}${ROUTES.tasks}/${id}`;
-  const label = titleWithId();
-  const html = `<a href="${escapeHtml(url)}">${escapeHtml(label)}</a>`;
-  return navigator.clipboard.write([
-    new ClipboardItem({
-      'text/html': new Blob([html], { type: 'text/html' }),
-      'text/plain': new Blob([`${label} ${url}`], { type: 'text/plain' }),
-    }),
-  ]);
-};
-
 const titleMenuItems = computed(() => [
   {
     label: 'Скопировать название',
     icon: 'i-lucide-copy',
-    onSelect: () => copy(() => navigator.clipboard.writeText(titleWithId())),
+    onSelect: () => props.task && copy(() => copyTaskLabel(props.task!)),
   },
   {
     label: 'Скопировать название и ссылку',
     icon: 'i-lucide-link',
-    onSelect: () => copy(writeTitleLink),
+    onSelect: () => props.task && copy(() => copyTaskLink(props.task!)),
   },
   { label: 'Редактировать', icon: 'i-lucide-pencil', onSelect: startTitleEdit },
 ]);
@@ -96,6 +78,8 @@ const titleMenuItems = computed(() => [
 const patch = (value: Partial<Task>) => {
   if (props.task) emit('update', props.task.id, value);
 };
+
+const { addFiles, removeFile, updateDescription } = useTaskAttachments(() => props.task, patch);
 
 // Статусы — колонки доски; цвет колонки показываем точкой
 const statusOptions = computed(() =>
@@ -146,48 +130,6 @@ const availableUsers = (field: PeopleField) =>
     .filter(u => !peopleOf(field).some(p => p.id === u.id))
     .map(u => ({ value: u.id, label: u.fullName, avatar: { alt: u.fullName } }));
 
-const addFiles = (files: TaskFile[]) => {
-  if (props.task) patch({ files: [...(props.task.files ?? []), ...files] });
-};
-
-const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-// Удалённые файлы (url → файл): если изображение вернули через Ctrl+Z, файл возвращается в список
-const removedFiles = new Map<string, TaskFile>();
-
-const removeFile = (id: string) => {
-  const file = props.task?.files?.find(f => f.id === id);
-  if (!props.task || !file) return;
-  removedFiles.set(file.url, file);
-  // Вместе с файлом убираем его изображения из описания
-  const image = new RegExp(`!\\[[^\\]]*\\]\\(${escapeRegExp(file.url)}[^)]*\\)\\n*`, 'g');
-  patch({
-    files: props.task.files?.filter(f => f.id !== id),
-    description: (props.task.description ?? '').replace(image, ''),
-  });
-};
-
-// Изображение, удалённое из описания, пропадает и из файлов; вернулось в описание — вернулось и в файлы
-const updateDescription = (value: string) => {
-  if (!props.task) return;
-  const previous = props.task.description ?? '';
-  const files = props.task.files ?? [];
-
-  const orphaned = files.filter(f => previous.includes(f.url) && !value.includes(f.url));
-  orphaned.forEach(f => removedFiles.set(f.url, f));
-
-  const restored = [...removedFiles.values()].filter(
-    f => value.includes(f.url) && !files.some(existing => existing.id === f.id)
-  );
-  restored.forEach(f => removedFiles.delete(f.url));
-
-  if (!orphaned.length && !restored.length) return patch({ description: value });
-  patch({
-    description: value,
-    files: [...files.filter(f => !orphaned.includes(f)), ...restored],
-  });
-};
-
 const addPerson = (field: PeopleField, id: string | null) => {
   const user = mockUsers.find(u => u.id === id);
   if (user && props.task) patch({ [field]: [...peopleOf(field), user] });
@@ -197,9 +139,7 @@ const removePerson = (field: PeopleField, id: string) => {
   if (props.task) patch({ [field]: peopleOf(field).filter(p => p.id !== id) });
 };
 
-const isOverdue = computed(
-  () => !!props.task && new Date(props.task.dueDate).getTime() < Date.now()
-);
+const isOverdue = computed(() => !!props.task && isPast(props.task.dueDate));
 const isOverspent = computed(
   () => !!props.task && props.task.spentHours > props.task.estimatedHours
 );
@@ -348,7 +288,11 @@ const isOverspent = computed(
               </span>
             </div>
 
-            <TaskTimer :key="task.id" :task-id="task.id" @add="patch({ spentHours: task.spentHours + $event })" />
+            <TaskTimer
+              :key="task.id"
+              :task-id="task.id"
+              @add="patch({ spentHours: task.spentHours + $event })"
+            />
           </div>
 
           <div

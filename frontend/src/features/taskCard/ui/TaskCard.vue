@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { complexityMap, priorityMap, typeMap } from '@/shared/config';
-import { formatHours } from '@/shared/lib/time';
+import { formatDate, formatHours, isPast } from '@/shared/lib/time';
 import type { Task } from '@/shared/types/task';
 
 const props = defineProps<{ task: Task }>();
@@ -16,15 +16,8 @@ const badgeRows = computed(() => [
   { hint: 'Тип задачи', rowIcon: 'i-lucide-tag', ...type.value },
 ]);
 
-const dueDateText = computed(() =>
-  new Date(props.task.dueDate).toLocaleDateString('ru-RU', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  })
-);
-
-const isOverdue = computed(() => new Date(props.task.dueDate).getTime() < Date.now());
+const dueDateText = computed(() => formatDate(props.task.dueDate));
+const isOverdue = computed(() => isPast(props.task.dueDate));
 const isOverspent = computed(() => props.task.spentHours > props.task.estimatedHours);
 </script>
 

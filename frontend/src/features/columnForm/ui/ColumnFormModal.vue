@@ -75,10 +75,10 @@ const submit = () => {
           </UButton>
           <UButton
             type="submit"
-            color="neutral"
+            color="secondary"
             size="xl"
             block
-            class="justify-center bg-indigo-600 text-white hover:bg-indigo-700"
+            class="justify-center text-white"
           >
             {{ column ? 'Редактировать' : 'Создать' }}
           </UButton>
