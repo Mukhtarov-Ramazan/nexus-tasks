@@ -29,7 +29,7 @@ const sidebarItems: NavigationMenuItem[] = [
 
 <template>
   <aside class="flex w-72 shrink-0 flex-col border-r border-default">
-    <div class="shrink-0 border-b border-default p-4">
+    <div class="shrink-0 border-b border-default px-4 py-6">
       <UTabs
         v-model="section"
         :items="sectionItems"

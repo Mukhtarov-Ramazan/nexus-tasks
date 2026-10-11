@@ -6,6 +6,9 @@ import KanbanColumnView from './KanbanColumnView.vue';
 
 const columns = defineModel<KanbanColumn[]>('columns', { required: true });
 const tasksByColumn = defineModel<Record<string, Task[]>>('tasksByColumn', { required: true });
+withDefaults(defineProps<{ view?: 'columns' | 'list'; dragDisabled?: boolean }>(), {
+  view: 'columns',
+});
 defineEmits<{
   editColumn: [id: string];
   deleteColumn: [id: string];
@@ -21,12 +24,15 @@ defineEmits<{
     handle=".column-handle"
     :animation="200"
     ghost-class="opacity-40"
-    class="flex h-full items-start gap-4 overflow-x-auto pb-2"
+    class="flex h-full gap-4 pb-2"
+    :class="view === 'list' ? 'flex-col overflow-y-auto' : 'items-start overflow-x-auto'"
   >
     <KanbanColumnView
       v-for="column in columns"
       :key="column.id"
       :column="column"
+      :view="view"
+      :drag-disabled="dragDisabled"
       v-model:tasks="tasksByColumn[column.id]"
       @edit="$emit('editColumn', column.id)"
       @delete="$emit('deleteColumn', column.id)"

@@ -1,6 +1,14 @@
 @import 'tailwindcss';
 @import '@nuxt/ui';
 
+/* Фирменный цвет бренда #4f39f6 (= indigo-600). Nuxt UI по умолчанию берёт оттенок 500/400,
+   поэтому фиксируем точный цвет для secondary в обеих темах. */
+:root,
+.dark {
+  --brand: #4f39f6;
+  --ui-secondary: var(--brand);
+}
+
 /* Приглушённая светлая тема (тёмную не затрагиваем) */
 :root:not(.dark) {
   --ui-bg: #ececec;

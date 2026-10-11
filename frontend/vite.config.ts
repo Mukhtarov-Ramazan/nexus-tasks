@@ -13,7 +13,7 @@ export default defineConfig({
       ui: {
         colors: {
           primary: 'black',
-          secondary: 'sky',
+          secondary: 'indigo',
           neutral: 'neutral',
         },
         container: {

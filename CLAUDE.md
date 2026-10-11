@@ -80,7 +80,7 @@ Defined in `src/app/router/index.ts`:
 Configured in `vite.config.ts` via the `NuxtUI()` Vite plugin:
 
 - Primary color: `black`
-- Secondary color: `sky`
+- Secondary color: `indigo` — **фирменный цвет бренда `#4f39f6`** (= indigo-600; зафиксирован в `main.css` через `--ui-secondary`/`--brand`, в обеих темах одинаковый; не менять на дефолтный оттенок 500/400 и не хардкодить другие индиго); акценты и активные элементы делать через `color="secondary"`, не `primary` (он чёрный)
 - Neutral color: `neutral`
 - Container max-width: `1920px`
 

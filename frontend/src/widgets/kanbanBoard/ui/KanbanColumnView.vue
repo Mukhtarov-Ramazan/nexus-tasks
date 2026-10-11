@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { VueDraggable } from 'vue-draggable-plus';
-import { TaskCard } from '@/features/taskCard';
+import { TaskCard, TaskRow } from '@/features/taskCard';
 import { columnColors, defaultColumnColor } from '@/shared/config';
 import type { KanbanColumn } from '@/shared/types/column';
 import type { Task } from '@/shared/types/task';
 
-const props = defineProps<{ column: KanbanColumn }>();
+const props = withDefaults(
+  defineProps<{ column: KanbanColumn; view?: 'columns' | 'list'; dragDisabled?: boolean }>(),
+  { view: 'columns' }
+);
 const tasks = defineModel<Task[]>('tasks', { required: true });
 const emit = defineEmits<{
   edit: [];
@@ -21,7 +24,10 @@ const headerButton = 'text-inherit hover:bg-white/20';
 </script>
 
 <template>
-  <section class="flex max-h-full w-80 shrink-0 flex-col rounded-lg bg-muted">
+  <section
+    class="flex shrink-0 flex-col rounded-lg bg-muted"
+    :class="view === 'list' ? 'w-full' : 'max-h-full w-80'"
+  >
     <header
       class="flex items-center gap-1 rounded-t-lg py-2 pr-2 pl-3"
       :class="[color.bg, color.text]"
@@ -72,17 +78,26 @@ const headerButton = 'text-inherit hover:bg-white/20';
     <VueDraggable
       v-model="tasks"
       group="tasks"
+      :disabled="dragDisabled"
       :animation="150"
       ghost-class="opacity-40"
-      class="flex min-h-24 flex-1 flex-col gap-2 overflow-y-auto p-2"
+      class="flex flex-1 flex-col p-2"
+      :class="view === 'list' ? 'min-h-12 gap-1.5' : 'min-h-24 gap-2 overflow-y-auto'"
     >
-      <TaskCard
-        v-for="task in tasks"
-        :key="task.id"
-        :task="task"
-        class="shrink-0 cursor-pointer"
-        @click="emit('openTask', task.id)"
-      />
+      <template v-for="task in tasks" :key="task.id">
+        <TaskRow
+          v-if="view === 'list'"
+          :task="task"
+          class="shrink-0 cursor-pointer"
+          @click="emit('openTask', task.id)"
+        />
+        <TaskCard
+          v-else
+          :task="task"
+          class="shrink-0 cursor-pointer"
+          @click="emit('openTask', task.id)"
+        />
+      </template>
     </VueDraggable>
   </section>
 </template>

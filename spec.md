@@ -88,7 +88,7 @@ src/
 
 ### Конфигурация Nuxt UI (`vite.config.ts`)
 
-- `primary`: `black`, `secondary`: `sky`, `neutral`: `neutral`.
+- `primary`: `black`, `secondary`: `indigo` (фирменный цвет `#4f39f6` = indigo-600, зафиксирован в `main.css` через `--ui-secondary`; для акцентов и активных состояний использовать `color="secondary"`), `neutral`: `neutral`.
 - Контейнер: max-width `1920px`.
 
 ### Стили

@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia';
 import { useRoute, useRouter } from 'vue-router';
 import { ColumnFormModal } from '@/features/columnForm';
 import { TaskDetails } from '@/features/taskDetails';
+import { TaskFilters, countFilters, emptyFilters, matchesFilters } from '@/features/taskFilters';
 import { KanbanBoard } from '@/widgets/kanbanBoard';
 import { ROUTES } from '@/shared/config';
 import type { KanbanColumn } from '@/shared/types/column';
@@ -12,6 +13,45 @@ import { useKanbanStore } from '@/stores/kanban';
 
 const store = useKanbanStore();
 const { columns, tasks, tasksByColumn } = storeToRefs(store);
+
+// Фильтры: при активных показываем копии списков, перетаскивание отключено
+const filters = ref(emptyFilters());
+const search = ref('');
+const query = computed(() => search.value.trim().toLowerCase());
+const filtersActive = computed(() => countFilters(filters.value) > 0 || !!query.value);
+const matchesSearch = (t: Task) =>
+  !query.value ||
+  t.title.toLowerCase().includes(query.value) ||
+  t.id.toLowerCase().includes(query.value);
+const visibleTasksByColumn = computed(() =>
+  filtersActive.value
+    ? Object.fromEntries(
+        Object.entries(tasksByColumn.value).map(([id, list]) => [
+          id,
+          list.filter(t => matchesFilters(t, filters.value) && matchesSearch(t)),
+        ])
+      )
+    : tasksByColumn.value
+);
+
+// Вид доски: колонками или списком (запоминаем выбор)
+type BoardView = 'columns' | 'list';
+const VIEW_KEY = 'tasks-view';
+const readView = (): BoardView => {
+  try {
+    return localStorage.getItem(VIEW_KEY) === 'list' ? 'list' : 'columns';
+  } catch {
+    return 'columns';
+  }
+};
+const view = ref<BoardView>(readView());
+watch(view, value => {
+  try {
+    localStorage.setItem(VIEW_KEY, value);
+  } catch {
+    // localStorage недоступен — не страшно
+  }
+});
 
 const route = useRoute();
 const router = useRouter();
@@ -76,8 +116,54 @@ const confirmDelete = () => {
 
 <template>
   <section class="flex h-full flex-col gap-4">
-    <div class="flex items-center justify-between gap-3">
-      <h2 class="text-2xl font-semibold">Задачи</h2>
+    <!-- mb-6: верх доски на уровне первого пункта сайдбара (низ блока переключателя = 24px, плюс gap-4) -->
+    <div class="mb-6 flex min-h-10 items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <UFieldGroup>
+          <UTooltip text="Колонками">
+            <UButton
+              icon="i-lucide-columns-3"
+              :color="view === 'columns' ? 'secondary' : 'neutral'"
+              :variant="view === 'columns' ? 'solid' : 'outline'"
+              :class="{ 'text-white': view === 'columns' }"
+              size="md"
+              aria-label="Вид колонками"
+              @click="view = 'columns'"
+            />
+          </UTooltip>
+          <UTooltip text="Списком">
+            <UButton
+              icon="i-lucide-list"
+              :color="view === 'list' ? 'secondary' : 'neutral'"
+              :variant="view === 'list' ? 'solid' : 'outline'"
+              :class="{ 'text-white': view === 'list' }"
+              size="md"
+              aria-label="Вид списком"
+              @click="view = 'list'"
+            />
+          </UTooltip>
+        </UFieldGroup>
+        <UInput
+          v-model="search"
+          icon="i-lucide-search"
+          placeholder="Поиск по названию или номеру"
+          size="md"
+          class="w-72"
+          :ui="{ trailing: 'pe-1' }"
+        >
+          <template v-if="search" #trailing>
+            <UButton
+              icon="i-lucide-x"
+              color="neutral"
+              variant="link"
+              size="sm"
+              aria-label="Очистить поиск"
+              @click="search = ''"
+            />
+          </template>
+        </UInput>
+        <TaskFilters v-model="filters" />
+      </div>
       <UTooltip text="Создать колонку">
         <UButton
           icon="i-lucide-plus"
@@ -93,7 +179,9 @@ const confirmDelete = () => {
     <div class="min-h-0 flex-1">
       <KanbanBoard
         v-model:columns="columns"
-        v-model:tasks-by-column="tasksByColumn"
+        :tasks-by-column="visibleTasksByColumn"
+        :drag-disabled="filtersActive"
+        :view="view"
         @edit-column="openEdit"
         @delete-column="deletingColumn = columns.find(c => c.id === $event) ?? null"
         @open-task="openTask"
