@@ -23,6 +23,11 @@ const selectedTask = computed(() => tasks.value.find(t => t.id === selectedId.va
 const shownTask = ref<Task | null>(null);
 watch(selectedTask, task => task && (shownTask.value = task), { immediate: true });
 
+const parentTask = computed(
+  () => tasks.value.find(t => t.id === shownTask.value?.parentId) ?? null
+);
+const subtasks = computed(() => tasks.value.filter(t => t.parentId === shownTask.value?.id));
+
 const isOpen = computed({
   get: () => !!selectedTask.value,
   set: value => {
@@ -118,7 +123,11 @@ const confirmDelete = () => {
       v-model:open="isOpen"
       :task="shownTask"
       :columns="columns"
+      :parent="parentTask"
+      :subtasks="subtasks"
       @update="store.updateTask"
+      @create-subtask="store.addSubtask"
+      @open-task="openTask"
     />
   </section>
 </template>

@@ -17,11 +17,21 @@ import TaskDescriptionEditor from './TaskDescriptionEditor.vue';
 import TaskBadgeSelect from './TaskBadgeSelect.vue';
 import TaskDeadline from './TaskDeadline.vue';
 import TaskFiles from './TaskFiles.vue';
+import TaskSubtasks from './TaskSubtasks.vue';
 import TaskTimer from './TaskTimer.vue';
 
-const props = defineProps<{ task: Task | null; columns: KanbanColumn[] }>();
+const props = defineProps<{
+  task: Task | null;
+  columns: KanbanColumn[];
+  parent?: Task | null;
+  subtasks?: Task[];
+}>();
 const open = defineModel<boolean>('open', { default: false });
-const emit = defineEmits<{ update: [id: string, patch: Partial<Task>] }>();
+const emit = defineEmits<{
+  update: [id: string, patch: Partial<Task>];
+  'create-subtask': [parentId: string, title: string];
+  'open-task': [id: string];
+}>();
 
 const expanded = ref(false);
 
@@ -261,6 +271,18 @@ const isOverspent = computed(
       >
         <!-- Основная часть -->
         <div class="flex min-w-0 flex-col gap-4 overflow-y-auto p-4 sm:p-6">
+          <button
+            v-if="parent"
+            type="button"
+            class="flex w-full shrink-0 items-center gap-2 rounded-md border border-default bg-elevated px-3 py-2 text-left text-sm transition-colors hover:bg-accented"
+            @click="emit('open-task', parent.id)"
+          >
+            <UIcon name="i-lucide-corner-left-up" class="size-4 shrink-0 text-muted" />
+            <span class="shrink-0 text-xs text-muted">Родительская задача</span>
+            <span class="shrink-0 text-xs text-muted">{{ parent.id }}</span>
+            <span class="min-w-0 flex-1 truncate">{{ parent.title }}</span>
+          </button>
+
           <TaskDescriptionEditor
             :key="task.id"
             :model-value="task.description ?? ''"
@@ -273,6 +295,14 @@ const isOverspent = computed(
             :files="task.files ?? []"
             @add="addFiles"
             @remove="removeFile"
+          />
+
+          <TaskSubtasks
+            class="shrink-0"
+            :subtasks="subtasks ?? []"
+            :columns="columns"
+            @create="emit('create-subtask', task.id, $event)"
+            @open="emit('open-task', $event)"
           />
         </div>
 

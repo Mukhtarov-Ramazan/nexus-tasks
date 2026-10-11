@@ -16,6 +16,8 @@ export interface Task {
   /** Id колонки канбан-доски */
   status: string;
   files?: TaskFile[];
+  /** Id родительской задачи, если это подзадача */
+  parentId?: string;
   assignees: TaskAssignee[];
   /** Наблюдатели; по умолчанию — автор задачи */
   watchers?: TaskAssignee[];

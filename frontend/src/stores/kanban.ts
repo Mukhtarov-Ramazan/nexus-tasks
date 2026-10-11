@@ -146,5 +146,34 @@ export const useKanbanStore = defineStore('kanban', () => {
     Object.assign(task, patch);
   };
 
-  return { columns, tasks, tasksByColumn, addColumn, updateColumn, removeColumn, updateTask };
+  /** Создаёт подзадачу в той же колонке, что и родитель; на доске отображается как обычная задача */
+  const addSubtask = (parentId: string, title: string) => {
+    const parent = tasks.value.find(t => t.id === parentId);
+    if (!parent || !tasksByColumn.value[parent.status]) return;
+    const max = Math.max(0, ...tasks.value.map(t => Number(t.id.split('-')[1]) || 0));
+    tasksByColumn.value[parent.status].push({
+      id: `NX-${max + 1}`,
+      title,
+      parentId,
+      status: parent.status,
+      assignees: [],
+      priority: 'medium',
+      complexity: 'easy',
+      dueDate: parent.dueDate,
+      estimatedHours: 0,
+      spentHours: 0,
+      type: parent.type,
+    });
+  };
+
+  return {
+    columns,
+    tasks,
+    tasksByColumn,
+    addColumn,
+    updateColumn,
+    removeColumn,
+    updateTask,
+    addSubtask,
+  };
 });
