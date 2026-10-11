@@ -25,6 +25,38 @@
   scrollbar-color: rgb(115 115 115 / 0.45) transparent;
 }
 
+/* Курсор для кликабельных элементов */
+button,
+a[href],
+select,
+summary,
+label[for],
+input[type='checkbox'],
+input[type='radio'],
+input[type='file'],
+input[type='range'],
+[role='button'],
+[role='combobox'],
+[role='option'],
+[role='menuitem'],
+[role='menuitemcheckbox'],
+[role='menuitemradio'],
+[role='tab'],
+[role='switch'],
+[role='checkbox'],
+[role='radio'],
+[role='link'] {
+  cursor: pointer;
+}
+
+button:disabled,
+select:disabled,
+[disabled],
+[aria-disabled='true'],
+[data-disabled] {
+  cursor: not-allowed;
+}
+
 @theme {
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
